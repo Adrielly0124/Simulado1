@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Estoque</title>
+</head>
+<body>
+  <h1>Controle de Estoque</h1>
+
+  <h2>Adicionar Produto</h2>
+  <form id="addForm">
+    <input type="text" id="addNome" placeholder="Nome do produto" required />
+    <input type="number" id="addQtd" placeholder="Quantidade" required />
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <h2>Remover Produto</h2>
+  <form id="removeForm">
+    <input type="text" id="removeNome" placeholder="Nome do produto" required />
+    <button type="submit">Remover</button>
+  </form>
+
+  <h2>Atualizar Produto</h2>
+  <form id="updateForm">
+    <input type="text" id="updateNome" placeholder="Nome do produto" required />
+    <input type="number" id="updateQtd" placeholder="Nova quantidade" required />
+    <button type="submit">Atualizar</button>
+  </form>
+
+  <h2>Verificar Estoque</h2>
+  <form id="checkForm">
+    <input type="text" id="checkNome" placeholder="Nome do produto" required />
+    <button type="submit">Verificar</button>
+  </form>
+
+  <h2>Listar Produtos</h2>
+  <button onclick="listarProdutos()">Listar Todos</button>
+
+  <h2>Estoque Baixo (menos de 5)</h2>
+  <button onclick="listarBaixo()">Verificar</button>
+
+  <pre id="saida"></pre>
+
+  <script>
+    const API = 'http://localhost:3000';
+
+    //alterado pelo chat
+
+    document.getElementById('addForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('addNome').value;
+      const quantidade = document.getElementById('addQtd').value;
+      const res = await fetch(`${API}/produtos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, quantidade: parseInt(quantidade) }),
+      });
+      const data = await res.json();
+      mostrar(data);
+    };
+
+    document.getElementById('removeForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('removeNome').value;
+      const res = await fetch(`${API}/produtos/${nome}`, { method: 'DELETE' });
+      const data = await res.json();
+      mostrar(data);
+    };
+
+    document.getElementById('updateForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('updateNome').value;
+      const quantidade = document.getElementById('updateQtd').value;
+      const res = await fetch(`${API}/produtos/${nome}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantidade: parseInt(quantidade) }),
+      });
+      const data = await res.json();
+      mostrar(data);
+    };
+
+    document.getElementById('checkForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('checkNome').value;
+      const res = await fetch(`${API}/produtos/${nome}`);
+      const data = await res.json();
+      mostrar(data);
+    };
+
+    async function listarProdutos() {
+      const res = await fetch(`${API}/produtos`);
+      const data = await res.json();
+      mostrar(data);
+    }
+
+    async function listarBaixo() {
+      const res = await fetch(`${API}/produtos/baixo`);
+      const data = await res.json();
+      mostrar(data);
+    }
+
+    function mostrar(dados) {
+      document.getElementById('saida').textContent = JSON.stringify(dados, null, 2);
+    }
+  </script>
+</body>
+</html>
