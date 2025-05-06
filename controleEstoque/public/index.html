@@ -97,9 +97,14 @@
     async function listarBaixo() {
       const res = await fetch(`${API}/produtos/baixo`);
       const data = await res.json();
-      mostrar(data);
-    }
 
+      if (Object.keys(data).length === 0) {
+      mostrar({ erro: "Nenhum produto com estoque baixo encontrado." });
+      } else {
+      mostrar(data);
+       }
+    }
+    
     function mostrar(dados) {
       document.getElementById('saida').textContent = JSON.stringify(dados, null, 2);
     }

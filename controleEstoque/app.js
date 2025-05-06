@@ -50,7 +50,24 @@ app.get('/produtos', (req, res) => {
 });
 
 //chat
-// Verificar produto específico
+//verificar estoque baixo
+app.get('/produtos/baixo', (req, res) => {
+  const baixoEstoque = {};
+  for (const [nome, qtd] of Object.entries(estoque)) {
+    const quantidade = Number(qtd);
+    if (!isNaN(quantidade) && quantidade < 5) {
+      baixoEstoque[nome] = quantidade;
+    }
+  }
+
+  if (Object.keys(baixoEstoque).length === 0) {
+    return res.status(404).json({ erro: 'Produto baixo não encontrado.' });
+  }
+
+  res.json(baixoEstoque);
+});
+
+// verificar produto específico
 app.get('/produtos/:nome', (req, res) => {
   const { nome } = req.params;
   if (estoque[nome] !== undefined) {
@@ -58,27 +75,6 @@ app.get('/produtos/:nome', (req, res) => {
   } else {
     res.status(404).json({ erro: `Produto ${nome} não encontrado.` });
   }
-});
-
-// Verificar estoque baixo
-app.get('/produtos/baixo', (req, res) => {
-  if (!estoque || typeof estoque !== 'object') {
-    return res.status(500).json({ error: 'Estoque não está definido corretamente' });
-  }
-
-  const baixoEstoque = {};
-  
-  for (const [nome, qtd] of Object.entries(estoque)) {
-    // Converter para número caso seja string
-    const quantidade = Number(qtd);
-    
-    // Verificar se a conversão foi bem sucedida e se é menor que 5
-    if (!isNaN(quantidade) && quantidade < 5) {
-      baixoEstoque[nome] = quantidade;
-    }
-  }
-  
-  res.json(baixoEstoque);
 });
 
 app.listen(3000, () => {
